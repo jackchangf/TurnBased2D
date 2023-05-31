@@ -2,19 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-
-
 public class StateController : MonoBehaviour
 {
-    public IState currentState;
+    public static IState currentState;
     public Idle idleState = new Idle();
     public PlayerTurn playerTurn = new PlayerTurn();
     public EnemyTurn enemyTurn = new EnemyTurn();
-    public bool battleOver;
 
     public delegate void EventDelegate();
-    public event EventDelegate onStateChange; 
+    public static event EventDelegate onStateChange;
+    public static event EventDelegate onBattleOver;
+
+    public Transform enemyParent;
 
     // Start is called before the first frame update
     void Start()
@@ -35,6 +34,18 @@ public class StateController : MonoBehaviour
         currentState.OnEntry(this);
         onStateChange?.Invoke();
     }
+
+    public bool CheckBattleOver()
+    {
+        if (enemyParent.childCount == 0)
+        {
+            onBattleOver?.Invoke();
+            return true;
+        }
+
+        return false;
+    }
+
 }
 
 public interface IState
@@ -82,7 +93,7 @@ public class PlayerTurn : IState
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if(stateController.battleOver) stateController.ChangeState(stateController.idleState);
+            if(stateController.CheckBattleOver()) stateController.ChangeState(stateController.idleState);
             else stateController.ChangeState(stateController.enemyTurn);
         }
 
@@ -93,6 +104,7 @@ public class PlayerTurn : IState
     {
         Debug.Log("PlayerTurn onexit");
     }
+
 
 }
 
@@ -110,7 +122,7 @@ public class EnemyTurn : IState
         if (Input.GetKeyDown(KeyCode.Space))
         {
 
-            if (stateController.battleOver) stateController.ChangeState(stateController.idleState);
+            if (stateController.CheckBattleOver()) stateController.ChangeState(stateController.idleState);
             else stateController.ChangeState(stateController.playerTurn);
         }
     }

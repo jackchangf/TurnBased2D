@@ -5,14 +5,23 @@ using TMPro;
 public class UI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI stateText;
-    [SerializeField] private StateController stateController;
+    //[SerializeField] private StateController stateController;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        stateController.onStateChange += UpdateStateTextUI;
+        StateController.onStateChange += UpdateStateTextUI;
+        StateController.onBattleOver += UpdateStateTextUIBattleOver;
     }
+
+    private void OnDestroy()
+    {
+        StateController.onStateChange -= UpdateStateTextUI;
+        StateController.onBattleOver -= UpdateStateTextUIBattleOver;
+
+    }
+
 
     // Update is called once per frame
     void Update()
@@ -22,12 +31,12 @@ public class UI : MonoBehaviour
 
     private void UpdateStateTextUI()
     {
-        stateText.text = stateController.currentState.GetType().Name;
+        stateText.text = StateController.currentState.GetType().Name;
     }
 
-    private void OnDestroy()
+    private void UpdateStateTextUIBattleOver()
     {
-        stateController.onStateChange -= UpdateStateTextUI;
-
+        stateText.text = "Battle Over";
     }
+
 }
