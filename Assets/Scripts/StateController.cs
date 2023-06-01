@@ -13,7 +13,7 @@ public class StateController : MonoBehaviour
     public static event EventDelegate onStateChange;
     public static event EventDelegate onBattleOver;
 
-    public Transform enemyParent;
+    [SerializeField] private Transform enemyParent;
 
     // Start is called before the first frame update
     void Start()
